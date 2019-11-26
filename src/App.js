@@ -1,10 +1,10 @@
 import React from 'react';
-import Counter from './Counter'
+import CounterContainer from './containers/CounterContainer'
 
 const App = () => {
   return (
     <>
-      <Counter />
+      <CounterContainer />
     </>
   );
 };

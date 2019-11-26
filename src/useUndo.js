@@ -1,66 +1,52 @@
-// use-undo와 비슷하게 동작하는 친구
-
+// custom hooks인데 사용하지 않습니다. 지우려다 혹시 몰라서 일단 남겨뒀습니다.
 import {useState} from 'react';
 
 const useUndo = (obj) => {
-    const [state, setState] = useState({
-      obj:obj,
-      current:0,
-      list:[obj],
-      canUndo:false,
-      canRedo:false,
-    })
+  const [state, setState] = useState({
+    current:obj,
+    undoList:[],
+    redoList:[],
+  })
+  const actions = {
+    set:(newObj) => {
+      state.undoList.push(state.current)
+      setState({
+        ...state,
+        current:newObj,
+        redoList:[],
+      })
+    },
+    reset:()=>{
+      setState({
+        ...state,
+        current:obj,
+        undoList:[],
+        redoList:[],
+      })
+    },
+    undo:()=>{
+      if (state.undoList.length === 0) return
+      state.redoList.push(state.current)
+      let current = state.undoList.pop()
+      setState({
+        ...state,
+        current:current,
+      })
+    },
+    redo:()=>{
+      if (state.redoList.length === 0) return
+      state.undoList.push(state.current)
+      let current = state.redoList.pop()
+      setState({
+        ...state,
+        current:current,
+      })
+    },
+    canUndo:state.undoList.length===0?false:true,
+    canRedo:state.redoList.length===0?false:true,
+  }
 
-    const actions = {
-      // set함수는 비동기 함수이기 때문에 값이 바뀌길 기대하면 안된다.
-      set:(newObj) => {
-        const newList = state.list.slice(0, state.current+1)
-        newList.push(newObj)
-        setState({
-          ...state,
-          obj:newObj,
-          current:state.current+1,
-          list:newList,
-          canUndo:true,
-          canRedo:false,
-        })
-      },
-      reset:()=>{
-        setState({
-          ...state,
-          obj:obj,
-          current:0,
-          list:[obj],
-          canUndo:false,
-          canRedo:false,
-        })
-      },
-      undo:()=>{
-        let canUndo = true
-        if (state.current-1 === 0) canUndo = false
-        setState({
-          ...state,
-          obj:state.list[state.current-1],
-          current:state.current-1,
-          canUndo:canUndo,
-          canRedo:true,
-        })
-      },
-      redo:()=>{
-        let canRedo = true
-        if (state.list.length-1 <= state.current+1) canRedo = false
-        setState({
-          ...state,
-          obj:state.list[state.current+1],
-          current:state.current+1,
-          canUndo:true,
-          canRedo:canRedo,
-        })
-      },
-      canUndo:state.canUndo,
-      canRedo:state.canRedo,
-    }
-    return [state.obj, actions]; 
+  return [state.current, actions]; 
 };
 
 export default useUndo;

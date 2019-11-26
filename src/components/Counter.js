@@ -1,7 +1,6 @@
 import React, {useState, useRef} from "react";
 import "reset-css";
 import styled from "styled-components";
-import useUndo from './useUndo'
 
 const Root = styled.div`
   height: 100vh;
@@ -22,7 +21,7 @@ const NumberSpan = styled.span`
   flex: 1;
   font-size: 100px;
   font-weight: 600;
-  color: olive;
+  color: rgb(0,125,100);
   align-items: center;
   justify-content: center;
 `;
@@ -35,9 +34,10 @@ const InputBoard = styled.div`
 `;
 
 const Input = styled.input`
-  flex: 0.5;
+  flex: 0.4;
   font-size: 30px;
-  text-align: right;
+  text-align: center;
+  border-radius: 20px;
 `;
 
 const ButtonBoard = styled.div`
@@ -49,7 +49,7 @@ const ButtonBoard = styled.div`
 
 const CircleButton = styled.button`
   color: white;
-  background-color: ${props => (props.disabled ? "darkgray" : "gray")};
+  background-color: ${props => (props.disabled ? "gray" : "rgb(255,50,50)")};
   height: 100px;
   width: 100px;
   border-radius: 50%;
@@ -66,18 +66,7 @@ const CircleButton = styled.button`
   }
 `;
 
-const App = () => {
-  const [
-    number, 
-    {
-      set: setNumber,
-      undo: undoNumber,
-      redo: redoNumber,
-      canUndo,
-      canRedo,
-    },
-  ] =useUndo(0)
-  
+const Counter = ({number, canUndo, canRedo, handleUndo, handleRedo, handleIncrease, handleDecrease}) => {
   const [form, setForm] = useState({
     input:'',
   })
@@ -110,23 +99,23 @@ const App = () => {
     })
   }
 
-  const handleIncrease = () => {
-    setNumber(number+parseInt(input))
+  const _handleIncrease = () => {
+    handleIncrease(parseInt(input))
     removeAndFocusOnInput()
   }
 
-  const handleDecrease = () => {
-    setNumber(number-parseInt(input))
+  const _handleDecrease = () => {
+    handleDecrease(parseInt(input))
     removeAndFocusOnInput()
   }
 
-  const handleUndo = () => {
-    undoNumber()
+  const _handleUndo = () => {
+    handleUndo()
     inputRef.current.focus()
   }
 
-  const handleRedo = () => {
-    redoNumber()
+  const _handleRedo = () => {
+    handleRedo()
     inputRef.current.focus()
   }
 
@@ -144,13 +133,13 @@ const App = () => {
           placeholder='숫자를 입력하세요'/>
       </InputBoard>
       <ButtonBoard>
-        <CircleButton onClick={handleUndo} disabled={!canUndo}>Undo</CircleButton>
-        <CircleButton onClick={handleIncrease} disabled={isFormNaN.input}>+</CircleButton>
-        <CircleButton onClick={handleDecrease} disabled={isFormNaN.input}>-</CircleButton>
-        <CircleButton onClick={handleRedo} disabled={!canRedo}>Redo</CircleButton>
+        <CircleButton onClick={_handleUndo} disabled={!canUndo}>Undo</CircleButton>
+        <CircleButton onClick={_handleIncrease} disabled={isFormNaN.input}>+</CircleButton>
+        <CircleButton onClick={_handleDecrease} disabled={isFormNaN.input}>-</CircleButton>
+        <CircleButton onClick={_handleRedo} disabled={!canRedo}>Redo</CircleButton>
       </ButtonBoard>
     </Root>
   )
 };
 
-export default App;
+export default Counter;
